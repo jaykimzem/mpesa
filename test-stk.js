@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 async function testSTK() {
     const payload = {
@@ -13,7 +13,7 @@ async function testSTK() {
         console.log('Success:', response.data);
     } catch (error) {
         console.error('Error:', error.response ? error.response.data : error.message);
-        console.log('\nTip: Make sure you are running "vercel dev" and have your .env configured.');
+        console.log('\nTip: Make sure you are running the local server (node index.js) and have your .env configured.');
     }
 }
 

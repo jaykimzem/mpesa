@@ -1,8 +1,15 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const stkpush = require('./api/stkpush').default;
-const callback = require('./api/callback').default;
-require('dotenv').config();
+import express from 'express';
+import bodyParser from 'body-parser';
+import stkpush from './api/stkpush.js';
+import callback from './api/callback.js';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(bodyParser.json());

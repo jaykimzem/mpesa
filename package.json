@@ -1,6 +1,7 @@
 {
   "name": "mpesa-stkpush-vercel",
   "version": "1.0.0",
+  "type": "module",
   "description": "M-Pesa STK Push integration for Vercel",
   "main": "index.js",
   "scripts": {
