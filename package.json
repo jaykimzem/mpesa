@@ -5,7 +5,7 @@
   "description": "M-Pesa STK Push integration for Vercel",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node local-dev.js"
   },
   "dependencies": {
     "axios": "^1.4.0",
