@@ -1,15 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/stkpush.js": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 30
-    },
-    "api/callback.js": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 30
-    }
-  },
   "headers": [
     {
       "source": "/api/(.*)",
