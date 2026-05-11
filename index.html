@@ -3,277 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M-Pesa STK Push Test Tool</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>M-Pesa Debugger | Phumolo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #c5a059;
-            --primary-dark: #a68545;
             --bg: #0f172a;
             --card-bg: #1e293b;
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --success: #22c55e;
             --error: #ef4444;
-            --glass: rgba(30, 41, 59, 0.7);
+            --warning: #f59e0b;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            min-height: 100vh;
+            padding: 2rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            background-image: radial-gradient(circle at top right, rgba(197, 160, 89, 0.1), transparent),
-                              radial-gradient(circle at bottom left, rgba(197, 160, 89, 0.05), transparent);
-            padding: 20px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 450px;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.6s ease-out;
+        .container { width: 100%; max-width: 800px; }
+
+        .header { margin-bottom: 2rem; text-align: center; }
+        .header h1 { color: var(--primary); margin-bottom: 0.5rem; }
+        .header p { color: var(--text-muted); }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            height: fit-content;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; }
         input {
             width: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 14px 16px;
-            color: var(--text);
-            font-size: 16px;
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+            padding: 0.8rem;
+            color: white;
             font-family: inherit;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
         }
 
         button {
             width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
+            background: var(--primary);
+            color: black;
             border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
+            border-radius: 0.5rem;
+            padding: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(197, 160, 89, 0.3);
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .log-container {
+            grid-column: span 1;
         }
 
-        button:active {
-            transform: translateY(0);
+        #debug-output {
+            background: #000;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            min-height: 300px;
+            max-height: 500px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .status-card {
-            margin-top: 24px;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            display: none;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .status-card.success {
-            display: block;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-        }
-
-        .status-card.error {
-            display: block;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
-
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-            display: none;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .footer {
-            margin-top: 32px;
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+        .log-entry { margin-bottom: 0.8rem; border-left: 3px solid #334155; padding-left: 0.8rem; }
+        .log-time { color: var(--text-muted); font-size: 0.7rem; }
+        .log-msg { margin-top: 0.2rem; }
+        .log-success { border-color: var(--success); color: #4ade80; }
+        .log-error { border-color: var(--error); color: #f87171; }
+        .log-json { background: #1e293b; padding: 0.5rem; border-radius: 0.3rem; margin-top: 0.5rem; display: block; white-space: pre-wrap; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>M-Pesa STK Push</h1>
-            <p>Test your payment integration</p>
+            <h1>M-Pesa Integration Debugger</h1>
+            <p>Direct API Testing & Response Tracking</p>
         </div>
 
-        <form id="stkForm">
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" id="phone" placeholder="e.g. 0712345678" required>
-            </div>
-            <div class="form-group">
-                <label for="amount">Amount (KES)</label>
-                <input type="number" id="amount" placeholder="e.g. 1" value="1" required>
-            </div>
-            <div class="form-group">
-                <label for="reference">Reference</label>
-                <input type="text" id="reference" placeholder="e.g. TestPayment" value="TestPayment">
+        <div class="grid">
+            <div class="card">
+                <form id="stkForm">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="phone" value="0727856464" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (KES)</label>
+                        <input type="number" id="amount" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reference</label>
+                        <input type="text" id="reference" value="TestPush">
+                    </div>
+                    <button type="submit" id="submitBtn">Trigger STK Push</button>
+                </form>
+
+                <div style="margin-top: 2rem; font-size: 0.8rem; color: var(--text-muted);">
+                    <p><strong>Note:</strong> This form hits your <code>/api/stkpush</code> route. Check Vercel Function logs for deep tracing.</p>
+                </div>
             </div>
 
-            <button type="submit" id="submitBtn">
-                <span class="loader" id="loader"></span>
-                <span id="btnText">Initiate Payment</span>
-            </button>
-        </form>
-
-        <div id="status" class="status-card"></div>
-
-        <div class="footer">
-            &copy; 2026 M-Pesa Integration Helper • Phumolo Marathon
+            <div class="log-container">
+                <div class="card" style="padding: 0; border: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 1rem;">
+                        <label style="margin: 0;">Traffic Logs</label>
+                        <button onclick="clearLogs()" style="width: auto; padding: 0.3rem 0.6rem; font-size: 0.7rem; background: #334155; color: white;">Clear</button>
+                    </div>
+                    <div id="debug-output"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        const output = document.getElementById('debug-output');
         const form = document.getElementById('stkForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loader = document.getElementById('loader');
-        const status = document.getElementById('status');
+        const btn = document.getElementById('submitBtn');
+
+        function addLog(msg, type = 'info', json = null) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            
+            const time = new Date().toLocaleTimeString();
+            let html = `<div class="log-time">[${time}]</div><div class="log-msg">${msg}</div>`;
+            
+            if (json) {
+                html += `<code class="log-json">${JSON.stringify(json, null, 2)}</code>`;
+            }
+            
+            entry.innerHTML = html;
+            output.prepend(entry);
+        }
+
+        function clearLogs() {
+            output.innerHTML = '';
+            addLog('Logs cleared. Ready for next request.');
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            btn.disabled = true;
             
-            // UI State: Loading
-            submitBtn.disabled = true;
-            loader.style.display = 'inline-block';
-            btnText.textContent = 'Processing...';
-            status.style.display = 'none';
-            status.className = 'status-card';
+            const payload = {
+                phone: document.getElementById('phone').value,
+                amount: document.getElementById('amount').value,
+                reference: document.getElementById('reference').value
+            };
 
-            const phone = document.getElementById('phone').value;
-            const amount = document.getElementById('amount').value;
-            const reference = document.getElementById('reference').value;
+            addLog(`Initiating request to /api/stkpush...`, 'info', payload);
 
             try {
+                const startTime = Date.now();
                 const response = await fetch('/api/stkpush', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ phone, amount, reference })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
 
+                const duration = Date.now() - startTime;
                 const data = await response.json();
 
                 if (response.ok) {
-                    status.textContent = 'Success! Check your phone for the M-Pesa prompt. CheckoutRequestID: ' + (data.CheckoutRequestID || 'N/A');
-                    status.classList.add('success');
+                    addLog(`Success after ${duration}ms! STK Push triggered.`, 'success', data);
                 } else {
-                    status.textContent = 'Error: ' + (data.error || 'Failed to initiate push');
-                    status.classList.add('error');
+                    addLog(`API Error (${response.status}) after ${duration}ms`, 'error', data);
                 }
             } catch (err) {
-                status.textContent = 'Network Error: ' + err.message;
-                status.classList.add('error');
+                addLog(`Network/Fetch Error: ${err.message}`, 'error');
             } finally {
-                submitBtn.disabled = false;
-                loader.style.display = 'none';
-                btnText.textContent = 'Initiate Payment';
-                status.style.display = 'block';
+                btn.disabled = false;
             }
         });
+
+        addLog('Debugger initialized. Enter details and trigger push.');
     </script>
 </body>
 </html>
